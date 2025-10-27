@@ -1,0 +1,101 @@
+/**
+ * @description This ruleset enforces a combination of user-ownership and public-read with owner-write access control patterns.
+ *
+ * Data Structure:
+ * - /users/{userId}: User profiles, accessible only by the owning user.
+ * - /resumes/{resumeId}: Resumes, publicly readable but only writable by the owner.
+ * - /jobPostings/{jobPostingId}: Job postings, publicly readable and writable by employers (owners).
+ * - /applications/{applicationId}: Job applications, accessible to the application creator.
+ *
+ * Key Security Decisions:
+ * - Users can only read and write their own profile data.
+ * - Resumes are publicly readable to enable ranking, but only the owner can modify them. The owner is determined by the `userProfileId` field on the resume.
+ * - Job Postings are publicly readable to enable job seekers, but can be created, updated, and deleted by employers (owners). The owner is determined by the `userProfileId` field on the job posting.
+ * - Applications are only accessible by the application creator.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Controls access to user profile documents.
+     * @path /users/{userId}
+     * @allow (create) - User with ID 'user123' can create their own profile document at /users/user123.
+     * @deny (create) - User with ID 'user456' cannot create a profile document at /users/user123.
+     * @allow (get, update, delete) - User with ID 'user123' can read, update, and delete their own profile document at /users/user123.
+     * @deny (get, update, delete) - User with ID 'user456' cannot read, update, or delete the profile document at /users/user123.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId} {
+      // Only signed-in users can interact with user profiles.
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if false; // User listing is not permitted.
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isSignedIn() && isOwner(userId);
+      allow delete: if isSignedIn() && isOwner(userId);
+    }
+
+    /**
+     * @description Controls access to resume documents.
+     * @path /resumes/{resumeId}
+     * @allow (get, list) - Any user, signed in or not, can read resume data.
+     * @allow (create) - A signed-in user can create a resume if the userProfileId matches their auth UID.
+     * @deny (create) - A signed-in user cannot create a resume with a userProfileId that does not match their auth UID.
+     * @allow (update, delete) - A signed-in user can update or delete a resume if the userProfileId matches their auth UID.
+     * @deny (update, delete) - A user cannot update or delete a resume they do not own.
+     * @principle Public read access with owner-only write access; enforces ownership on create, update, and delete.
+     */
+    match /resumes/{resumeId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.userProfileId == request.auth.uid;
+      allow update: if isSignedIn() && isExistingOwner(resource.data.userProfileId);
+      allow delete: if isSignedIn() && isExistingOwner(resource.data.userProfileId);
+    }
+
+    /**
+     * @description Controls access to job posting documents.
+     * @path /jobPostings/{jobPostingId}
+     * @allow (get, list) - Any user, signed in or not, can read job posting data.
+     * @allow (create) - A signed-in user can create a job posting if the userProfileId matches their auth UID.
+     * @deny (create) - A signed-in user cannot create a job posting with a userProfileId that does not match their auth UID.
+     * @allow (update, delete) - A signed-in user can update or delete a job posting if the userProfileId matches their auth UID.
+     * @deny (update, delete) - A user cannot update or delete a job posting they do not own.
+     * @principle Public read access with owner-only write access; enforces ownership on create, update, and delete.
+     */
+    match /jobPostings/{jobPostingId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.userProfileId == request.auth.uid;
+      allow update: if isSignedIn() && isExistingOwner(resource.data.userProfileId);
+      allow delete: if isSignedIn() && isExistingOwner(resource.data.userProfileId);
+    }
+
+    /**
+     * @description Controls access to application documents.
+     * @path /applications/{applicationId}
+     * @allow (create) - A signed-in user can create an application if the userProfileId matches their auth UID.
+     * @deny (create) - A signed-in user cannot create an application with a userProfileId that does not match their auth UID.
+     * @allow (get, update, delete, list) - A signed-in user can get, update, delete, and list an application if the userProfileId matches their auth UID.
+     * @deny (get, update, delete, list) - A user cannot get, update, or delete an application they do not own.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /applications/{applicationId} {
+      allow get, list: if isSignedIn() && isOwner(resource.data.userProfileId);
+      allow create: if isSignedIn() && request.resource.data.userProfileId == request.auth.uid;
+      allow update: if isSignedIn() && isExistingOwner(resource.data.userProfileId);
+      allow delete: if isSignedIn() && isExistingOwner(resource.data.userProfileId);
+    }
+  }
+
+  // Helper Functions
+  function isSignedIn() {
+    return request.auth != null;
+  }
+
+  function isOwner(userId) {
+    return request.auth.uid == userId;
+  }
+
+  function isExistingOwner(userId) {
+    return isSignedIn() && isOwner(userId) && resource != null;
+  }
+}
