@@ -39,7 +39,7 @@ Spend excessive time manually screening resumes
 
 Struggle to efficiently match candidates with job requirements
 
-💡 Solution
+# Solution
 
 Career AI provides:
 
