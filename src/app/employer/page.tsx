@@ -1,5 +1,4 @@
-
-"use client";
+'use client';
 
 import { useState } from 'react';
 import Image from 'next/image';
@@ -26,156 +25,9 @@ import { Switch } from '@/components/ui/switch';
 import { format } from 'date-fns';
 import { useJobs, type AppJobPosting } from '@/app/job-context';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import withAuth from '@/components/withAuth';
 
-const demoRankedResumes: RankResumesOutput = [
-  {
-    rank: 1,
-    resume: `
-Name: Elena Rodriguez
-Summary: Senior Frontend Engineer with 8+ years of experience crafting beautiful, high-performance user interfaces for SaaS platforms. Expert in React, TypeScript, and Next.js. Passionate about design systems and component-driven development.
-Experience: Led the migration of a monolithic frontend to a micro-frontend architecture at ScaleUp Inc., improving deployment frequency by 300%.
-Skills: React, TypeScript, Next.js, GraphQL, Web Performance, Design Systems, CI/CD
-`,
-    reason: `Elena is ranked #1 due to her extensive experience with our core tech stack (React, Next.js, TypeScript) and proven leadership in a similar migration project, which aligns perfectly with the role's key responsibilities.`,
-    overallAssessment: "An outstanding candidate whose skills and experience are a near-perfect match. The primary gap is a lack of direct experience with our secondary backend language, which is minor and can be learned quickly.",
-    shortcomings: [
-      { skill: "Python Experience", impact: "Minor delay in contributing to secondary backend services.", mitigation: "Provide a 2-week bootcamp on our Python services and pair with a senior backend engineer for the first month.", severity: "low" }
-    ]
-  },
-  {
-    rank: 2,
-    resume: `
-Name: Ben Carter
-Summary: A proactive Full-Stack Developer with a strong focus on backend systems using Node.js and GraphQL. Skilled in building scalable APIs and working in agile environments.
-Experience: Developed a real-time data processing pipeline at Innovate LLC, reducing latency by 40%.
-Skills: Node.js, GraphQL, TypeScript, PostgreSQL, Docker, AWS, Microservices
-`,
-    reason: `Ranked #2 for his deep backend expertise, especially with GraphQL and microservices. While his frontend skills are less pronounced than Elena's, his backend proficiency is a huge asset.`,
-    overallAssessment: "A very strong backend candidate. His frontend skills, while present, are not as senior-level as the role requires. This is a moderate gap that will require some ramp-up time.",
-    shortcomings: [
-      { skill: "Advanced React Patterns", impact: "May require more guidance on complex frontend state management and component architecture.", mitigation: "Enroll in an advanced React workshop and assign a frontend mentor.", severity: "moderate" },
-      { skill: "CSS-in-JS", impact: "Will need to learn our styling system (styled-components).", mitigation: "Code reviews focused on styling best practices.", severity: "low" }
-    ]
-  },
-  {
-    rank: 3,
-    resume: `
-Name: Saniya Khan
-Summary: A detail-oriented Software Engineer with 5 years of experience, specializing in React and data visualization libraries like D3.js. Enjoys translating complex data into intuitive user interfaces.
-Experience: Created an interactive analytics dashboard for a major fintech client, which was praised for its usability and performance.
-Skills: JavaScript, React, D3.js, Redux, CSS-in-JS, SQL
-`,
-    reason: `Saniya's strong React skills and unique experience in data visualization make her a strong candidate. She is ranked #3 as her experience is slightly less senior than the top candidates.`,
-    overallAssessment: "A solid mid-level engineer with a valuable specialization in data visualization. The main gap is her lack of cloud deployment experience, which is a key part of the role.",
-    shortcomings: [
-        { skill: "Cloud Deployment (AWS/GCP)", impact: "Cannot independently deploy or manage services in our cloud environment initially.", mitigation: "Pair with a DevOps engineer for initial deployments and provide access to cloud certification courses.", severity: "high" }
-    ]
-  },
-  {
-    rank: 4,
-    resume: `
-Name: David Chen
-Summary: Recent computer science graduate with a passion for web development and cloud technologies. Completed internships focusing on React and Python (Django). Eager to learn and contribute to a fast-paced team.
-Experience: Intern at Connectly, assisted in building new UI features and writing unit tests.
-Skills: React, JavaScript, Python, Django, HTML/CSS, Git
-`,
-    reason: `David is a promising junior candidate with relevant internship experience in React. Ranked #4 due to his junior status, but shows great potential and eagerness to grow.`,
-    overallAssessment: "A high-potential junior candidate. Lacks professional production experience, which is the most critical gap. He will require significant mentorship.",
-    shortcomings: [
-        { skill: "Production Environment Experience", impact: "Will need extensive mentoring on production best practices, CI/CD, and on-call responsibilities.", mitigation: "Assign a dedicated senior engineer as a mentor for the first 6 months. Start with low-risk tasks.", severity: "critical" },
-        { skill: "System Design", impact: "Unable to lead architectural discussions or design new features independently.", mitigation: "Include in all system design meetings as an observer and provide targeted reading material.", severity: "high" }
-    ]
-  },
-  {
-    rank: 5,
-    resume: `
-Name: Maria Garcia
-Summary: UX/UI Engineer who bridges the gap between design and development. Proficient in creating pixel-perfect interfaces from Figma mockups using React and styled-components.
-Experience: Worked closely with the design team at PixelPerfect Co. to build and maintain their component library.
-Skills: React, Storybook, Figma, styled-components, Accessibility (A11y)
-`,
-    reason: `Maria's unique blend of design and engineering skills is very valuable. She is ranked #5 because the role is more engineering-focused, but her expertise in component libraries is a significant plus.`,
-    overallAssessment: "Excellent frontend specialist with a design eye. Her backend skills are non-existent, making her a less-than-ideal fit for a full-stack role but perfect for a frontend-focused team.",
-    shortcomings: [
-        { skill: "Backend Development (Node.js, Databases)", impact: "Completely unable to contribute to API development or database management.", mitigation: "This is a fundamental skill gap. If hired, the role expectations must be adjusted to be purely frontend-focused.", severity: "critical" }
-    ]
-  },
-  {
-    rank: 6,
-    resume: `
-Name: Kevin Lee
-Summary: Mobile Developer with experience in React Native, transitioning to web development. Strong understanding of the React ecosystem and state management.
-Experience: Built a cross-platform mobile app for a startup, reaching 50k downloads.
-Skills: React Native, React, Redux, JavaScript, Firebase
-`,
-    reason: `Kevin's strong React background is transferable, but his primary experience is in mobile. He's ranked #6 as he would have a learning curve transitioning to web-specific technologies like Next.js.`,
-    overallAssessment: "Strong React developer, but in a mobile context. The gaps are in web-specific performance optimization and browser APIs, which will require a focused learning effort.",
-    shortcomings: [
-        { skill: "Next.js & SSR", impact: "Will need to learn Server-Side Rendering concepts and the Next.js framework, potentially slowing initial feature delivery.", mitigation: "Provide a Next.js course and pair with an experienced web developer.", severity: "moderate" },
-        { skill: "Web Performance Optimization", impact: "May not be familiar with web-specific performance metrics (e.g., Core Web Vitals) or optimization techniques (e.g., code splitting for web).", mitigation: "Training sessions on web performance and tooling.", severity: "moderate" }
-    ]
-  },
-  {
-    rank: 7,
-    resume: `
-Name: Olivia Martinez
-Summary: Backend Engineer with expertise in Java and Spring Boot. Has some exposure to frontend development and is looking to transition into a full-stack role.
-Experience: Maintained and scaled critical backend services for a large enterprise application.
-Skills: Java, Spring Boot, SQL, REST APIs, Maven
-`,
-    reason: `Olivia has a very strong backend foundation but in a different tech stack (Java). Ranked #7 due to the significant ramp-up time required for our Node.js and React environment.`,
-    overallAssessment: "A very experienced software engineer, but in a completely different ecosystem. The technology gap is the most critical issue and would require a significant investment in training.",
-    shortcomings: [
-        { skill: "JavaScript/TypeScript & Node.js", impact: "Core technology stack mismatch. Will have a steep learning curve and lower initial productivity.", mitigation: "A 3-6 month dedicated training plan and mentorship program. Not suitable for a role requiring immediate impact.", severity: "critical" },
-        { skill: "React Frontend Framework", impact: "Cannot contribute to the frontend codebase without significant training.", mitigation: "Same as the backend skill gap; requires extensive training.", severity: "critical" }
-    ]
-  },
-  {
-    rank: 8,
-    resume: `
-Name: James Wilson
-Summary: A Quality Assurance Engineer with a knack for automation using Cypress and Selenium. Has scripting experience with JavaScript and Python.
-Experience: Implemented an end-to-end automated testing suite, reducing manual testing time by 60%.
-Skills: Cypress, Selenium, JavaScript, Python, Jira, CI/CD
-`,
-    reason: `James has valuable automation skills and JavaScript knowledge, but lacks direct software development experience. Ranked #8 as this is a development role, not a QA role.`,
-    overallAssessment: "A strong QA Automation Engineer, but not a software developer. The role and skills are fundamentally different. He lacks experience in building features and application architecture.",
-    shortcomings: [
-        { skill: "Software Application Architecture", impact: "Not experienced in designing or building software from the ground up.", mitigation: "This represents a career change, not a skill gap. Would need to be hired for a junior/apprentice developer role.", severity: "critical" },
-        { skill: "Feature Development", impact: "Lacks experience in the full lifecycle of feature development, from requirements to deployment.", mitigation: "Same as above; requires a role transition.", severity: "high" }
-    ]
-  },
-  {
-    rank: 9,
-    resume: `
-Name: Fatima Al-Jamil
-Summary: Project Manager with a technical background. Understands software development lifecycles and agile methodologies, but has not been hands-on coding for several years.
-Experience: Successfully managed the delivery of three major software projects, on time and under budget.
-Skills: Agile, Scrum, JIRA, Project Planning, Stakeholder Management
-`,
-    reason: `While Fatima has excellent project management skills, she does not meet the hands-on coding requirements for this role. She is ranked #9 for this reason.`,
-    overallAssessment: "An excellent project manager, but not a fit for an individual contributor engineering role. The lack of recent hands-on coding is a critical gap.",
-    shortcomings: [
-        { skill: "Current Hands-On Coding", impact: "Unable to contribute to the codebase directly.", mitigation: "Not a fit for this role. Would be a great fit for a Project or Program Manager position.", severity: "critical" }
-    ]
-  },
-  {
-    rank: 10,
-    resume: `
-Name: Tom Nguyen
-Summary: Wordpress Developer with extensive experience in PHP and customizing themes and plugins. Basic knowledge of JavaScript and jQuery.
-Experience: Built and maintained dozens of websites for small to medium-sized businesses.
-Skills: PHP, WordPress, MySQL, jQuery, HTML, CSS
-`,
-    reason: `Tom's experience is in a completely different technology stack (PHP/WordPress) from what is required for the role. He is ranked #10 as his skills are not a direct match.`,
-    overallAssessment: "Experienced web developer, but in a technology stack that has very little overlap with our needs. The transition would be difficult and long.",
-    shortcomings: [
-        { skill: "Modern JavaScript Frameworks (React)", impact: "Core skill gap. Would need to learn React from the ground up.", mitigation: "Extensive training would be required, making him a high-risk hire for a non-junior role.", severity: "critical" },
-        { skill: "API-driven Development", impact: "Experience is primarily in a monolithic CMS (WordPress), not in building/consuming APIs for a SPA.", mitigation: "Would require a fundamental shift in development mindset.", severity: "high" }
-    ]
-  }
-];
-
+const demoRankedResumes: RankResumesOutput = [];
 
 function JobPostingGenerator({ onJobSaved }: { onJobSaved: (newPosting: AppJobPosting) => void }) {
   const [loading, setLoading] = useState(false);
@@ -243,12 +95,12 @@ function JobPostingGenerator({ onJobSaved }: { onJobSaved: (newPosting: AppJobPo
 
     try {
         const newPosting: AppJobPosting = {
-            id: `job-${Date.now()}`, // Simple unique ID for demo
+            id: `job-${Date.now()}`,
             userProfileId: userId,
             jobTitle: formData.jobTitle || 'Untitled Job',
             companyName: formData.companyName || 'Untitled Company',
             location: formData.location || 'Remote',
-            description: generatedPosting.split('\n')[0], // Use first line as short desc
+            description: generatedPosting.split('\n')[0],
             jobPostingText: generatedPosting,
             status: 'active',
             createdAt: new Date(),
@@ -444,12 +296,32 @@ function ResumeRanker({ jobPostings, onJobDelete, onJobUpdate }: { jobPostings: 
     }
   };
 
-  const handleDecision = (rank: number, candidateName: string, decision: 'Accepted' | 'Rejected') => {
+  const handleDecision = (rank: number, candidateName: string, candidateEmail: string, decision: 'Accepted' | 'Rejected') => {
     setDecisions(prev => ({ ...prev, [rank]: decision }));
     toast({
       title: `Candidate ${decision}`,
-      description: `${candidateName} has been ${decision.toLowerCase()}.`,
+      description: `${candidateName} has been ${decision.toLowerCase()}`,
     });
+
+    if (decision === 'Accepted') {
+      draftAcceptanceEmail(candidateName, candidateEmail);
+    }
+  };
+
+  const draftAcceptanceEmail = (candidateName: string, candidateEmail: string) => {
+    const subject = `Congratulations on Your Job Offer from ${selectedJob?.companyName}`;
+    const body = `Dear ${candidateName},
+
+We are thrilled to offer you the position of ${selectedJob?.jobTitle} at ${selectedJob?.companyName}. We were very impressed with your qualifications and experience, and we believe you would be a great asset to our team.
+
+We would like to offer you a starting salary of [Salary] and a start date of [Start Date]. Please find attached the official offer letter with more details about the role, benefits, and our company.
+
+We are very excited about the possibility of you joining our team. Please let us know if you have any questions.
+
+Best regards,
+The ${selectedJob?.companyName} Team`;
+
+    window.location.href = `mailto:${candidateEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   const handleDelete = (e: React.MouseEvent, jobId: string) => {
@@ -584,6 +456,7 @@ function ResumeRanker({ jobPostings, onJobDelete, onJobUpdate }: { jobPostings: 
             <div className="space-y-4">
               {rankedResumes.map(item => {
                 const candidateName = item.resume.match(/Name: (.*)/)?.[1] || 'Unknown Candidate';
+                const candidateEmail = item.resume.match(/Email: (.*)/)?.[1] || '';
                 const decision = decisions[item.rank];
                 return (
                   <Collapsible key={item.rank} asChild>
@@ -615,11 +488,11 @@ function ResumeRanker({ jobPostings, onJobDelete, onJobUpdate }: { jobPostings: 
                               </CollapsibleTrigger>
                             {!decision && (
                               <div className="flex gap-2">
-                                <Button size="sm" onClick={() => handleDecision(item.rank, candidateName, 'Accepted')} className="bg-green-600 hover:bg-green-700">
+                                <Button size="sm" onClick={() => handleDecision(item.rank, candidateName, candidateEmail, 'Accepted')} className="bg-green-600 hover:bg-green-700">
                                   <Check className="mr-2 h-4 w-4" />
                                   Accept
                                 </Button>
-                                <Button size="sm" variant="destructive" onClick={() => handleDecision(item.rank, candidateName, 'Rejected')}>
+                                <Button size="sm" variant="destructive" onClick={() => handleDecision(item.rank, candidateName, candidateEmail, 'Rejected')}>
                                   <X className="mr-2 h-4 w-4" />
                                   Reject
                                 </Button>
@@ -684,8 +557,7 @@ function PreviousPostings({ jobPostings, onDelete }: { jobPostings: AppJobPostin
   );
 }
 
-
-export default function EmployerPage() {
+function EmployerPage() {
   const [activeTab, setActiveTab] = useState("generator");
   const { jobs, addJob, updateJob, deleteJob } = useJobs();
   const { toast } = useToast();
@@ -734,3 +606,5 @@ export default function EmployerPage() {
     </div>
   );
 }
+
+export default withAuth(EmployerPage);

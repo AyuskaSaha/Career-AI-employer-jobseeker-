@@ -39,17 +39,39 @@ type ResumeData = {
 };
 
 const initialResumeData: ResumeData = {
-  personalInfo: { name: 'John Doe', email: 'john.doe@email.com', phone: '123-456-7890', location: 'New York, NY' },
-  summary: 'A highly motivated software engineer with 5+ years of experience in full-stack development, specializing in React and Node.js. Proven ability to lead projects and collaborate effectively in agile environments.',
+  personalInfo: {
+    name: 'AVASH BANERJEE',
+    email: 'itzavash@gmail.com',
+    phone: '8336027886',
+    location: 'Kolkata, India',
+  },
+  summary: 'Passionate Cyber-Security enthusiast with hands on experience in network security, security operations, and automation. Experienced in working with leading SIEM and SOAR platforms, and network security tools, backend and automation using python and modern web based frameworks. Assistant Teacher at a Computer Science institute as a part time',
   experience: [
-    { role: 'Senior Software Engineer', company: 'Tech Corp', dates: '2020 - Present', description: 'Led a team to develop a new e-commerce platform, increasing sales by 20%. Modernized the tech stack to use Next.js and GraphQL.' },
-    { role: 'Software Engineer', company: 'Innovate LLC', dates: '2018 - 2020', description: 'Worked on maintaining and improving legacy systems, reducing bug reports by 30% through proactive refactoring and testing.' },
+    {
+      role: 'Speaker and Core Member',
+      company: 'IEM Cysec Club, IEM',
+      dates: 'Jan 2023 - Present',
+      description: 'Conducted and organized training sessions, and CTF events for College Cybersecurity Club',
+    },
+    {
+      role: 'Intern',
+      company: 'ITorizin Technologies pvt ltd, Kolkata',
+      dates: 'Mar 2021 - Dec 2022',
+      description: 'Worked as a SOC analyst, triaging security incidents, and responding to threats. Engineered a tool for SOC L1 level log parsing across different platforms and incident report automation which lowered the time and efforts of triaging, and prevented breach of SLAs. Engaged with various SIEM and SOAR platforms including Crowdstrike, Seceon, Securonix. Gained considerable Knowledge about the architecture, Threat Hunting and Threat Modelling',
+    },
   ],
   education: [
-    { degree: 'B.S. in Computer Science', school: 'State University', dates: '2014 - 2018' },
+    { degree: 'B-Tech (CSE)', school: 'Institute of Engineering & Management', dates: '2023-2027' },
+    { degree: 'CLASS - XII (CBSE)', school: 'Bholananda National Vidyalaya', dates: '2023 passout' },
+    { degree: 'CLASS - X (ICSE)', school: 'Modern English Academy', dates: '2021 passout' },
   ],
-  skills: ['JavaScript', 'React', 'Node.js', 'TypeScript', 'SQL', 'Docker', 'GraphQL', 'Next.js'],
-  certificates: ['AWS Certified Developer - Associate']
+  skills: [
+    'Python', 'Java', 'C',
+    'Django', 'Flask', 'Fast-Api', 'HTML', 'CSS', 'JS', 'MySQL', 'Postgres', 'Supabase',
+    'Firewall (Fortigate, pfsense)', 'SIEMs and SOARs (crowdstrike, seceon, securonix)', 'Incident triaging and reporting', 'SOC operations',
+    'Burpsuite', 'Kali Linux', 'nmap', 'nessus', 'hydra', 'nikto', 'sqlmap', 'gobuster', 'sql injections', 'XSS', 'SSRF'
+  ],
+  certificates: [],
 };
 
 const resumeToText = (data: ResumeData) => {
@@ -75,7 +97,7 @@ const resumeToText = (data: ResumeData) => {
 
 function ResumePreview({ data }: { data: ResumeData }) {
   return (
-    <Card className="h-full">
+    <Card className="min-h-full border-2 border-primary/10 shadow-lg">
       <CardContent className="p-6">
         <div className="text-center border-b pb-4 mb-4">
           <h2 className="font-headline text-3xl font-bold">{data.personalInfo.name}</h2>
@@ -271,6 +293,76 @@ function ResumeBuilder() {
     setSaving(false);
   };
 
+  const handleExperienceChange = (index: number, field: keyof ResumeData['experience'][0], value: string) => {
+    const newExperience = [...resumeData.experience];
+    newExperience[index] = { ...newExperience[index], [field]: value };
+    setResumeData(prev => ({ ...prev, experience: newExperience }));
+  };
+
+  const addExperience = () => {
+    setResumeData(prev => ({
+      ...prev,
+      experience: [...prev.experience, { role: '', company: '', dates: '', description: '' }]
+    }));
+  };
+
+  const removeExperience = (index: number) => {
+    const newExperience = [...resumeData.experience];
+    newExperience.splice(index, 1);
+    setResumeData(prev => ({ ...prev, experience: newExperience }));
+  };
+
+  const handleEducationChange = (index: number, field: keyof ResumeData['education'][0], value: string) => {
+    const newEducation = [...resumeData.education];
+    newEducation[index] = { ...newEducation[index], [field]: value };
+    setResumeData(prev => ({ ...prev, education: newEducation }));
+  };
+
+  const addEducation = () => {
+    setResumeData(prev => ({
+      ...prev,
+      education: [...prev.education, { degree: '', school: '', dates: '' }]
+    }));
+  };
+
+  const removeEducation = (index: number) => {
+    const newEducation = [...resumeData.education];
+    newEducation.splice(index, 1);
+    setResumeData(prev => ({ ...prev, education: newEducation }));
+  };
+
+  const handleSkillChange = (index: number, value: string) => {
+    const newSkills = [...resumeData.skills];
+    newSkills[index] = value;
+    setResumeData(prev => ({ ...prev, skills: newSkills }));
+  };
+
+  const addSkill = () => {
+    setResumeData(prev => ({ ...prev, skills: [...prev.skills, ''] }));
+  };
+
+  const removeSkill = (index: number) => {
+    const newSkills = [...resumeData.skills];
+    newSkills.splice(index, 1);
+    setResumeData(prev => ({ ...prev, skills: newSkills }));
+  };
+
+  const handleCertificateChange = (index: number, value: string) => {
+    const newCertificates = [...resumeData.certificates];
+    newCertificates[index] = value;
+    setResumeData(prev => ({ ...prev, certificates: newCertificates }));
+  };
+
+  const addCertificate = () => {
+    setResumeData(prev => ({ ...prev, certificates: [...prev.certificates, ''] }));
+  };
+
+  const removeCertificate = (index: number) => {
+    const newCertificates = [...resumeData.certificates];
+    newCertificates.splice(index, 1);
+    setResumeData(prev => ({ ...prev, certificates: newCertificates }));
+  };
+
   return (
     <div className="grid lg:grid-cols-2 gap-8 items-start">
       <Card>
@@ -290,7 +382,54 @@ function ResumeBuilder() {
           <h3 className="font-semibold text-lg flex items-center"><Briefcase className="mr-2 h-5 w-5"/> Summary</h3>
           <Textarea placeholder="Professional Summary" className="min-h-[100px]" value={resumeData.summary} onChange={e => setResumeData(prev => ({...prev, summary: e.target.value}))} />
           
-          <p className="text-sm text-muted-foreground pt-4">For simplicity, experience, education, and skills are pre-filled. You can see the result in the preview.</p>
+          <Separator/>
+
+          <h3 className="font-semibold text-lg flex items-center">Experience</h3>
+          {resumeData.experience.map((exp, index) => (
+            <div key={index} className="space-y-2 border p-4 rounded-md">
+              <Input placeholder="Role" value={exp.role} onChange={e => handleExperienceChange(index, 'role', e.target.value)} />
+              <Input placeholder="Company" value={exp.company} onChange={e => handleExperienceChange(index, 'company', e.target.value)} />
+              <Input placeholder="Dates" value={exp.dates} onChange={e => handleExperienceChange(index, 'dates', e.target.value)} />
+              <Textarea placeholder="Description" value={exp.description} onChange={e => handleExperienceChange(index, 'description', e.target.value)} />
+              <Button variant="destructive" size="sm" onClick={() => removeExperience(index)}>Remove</Button>
+            </div>
+          ))}
+          <Button onClick={addExperience}>Add Experience</Button>
+
+          <Separator/>
+
+          <h3 className="font-semibold text-lg flex items-center">Education</h3>
+          {resumeData.education.map((edu, index) => (
+            <div key={index} className="space-y-2 border p-4 rounded-md">
+              <Input placeholder="Degree" value={edu.degree} onChange={e => handleEducationChange(index, 'degree', e.target.value)} />
+              <Input placeholder="School" value={edu.school} onChange={e => handleEducationChange(index, 'school', e.target.value)} />
+              <Input placeholder="Dates" value={edu.dates} onChange={e => handleEducationChange(index, 'dates', e.target.value)} />
+              <Button variant="destructive" size="sm" onClick={() => removeEducation(index)}>Remove</Button>
+            </div>
+          ))}
+          <Button onClick={addEducation}>Add Education</Button>
+
+          <Separator/>
+
+          <h3 className="font-semibold text-lg flex items-center">Skills</h3>
+          {resumeData.skills.map((skill, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <Input placeholder="Skill" value={skill} onChange={e => handleSkillChange(index, e.target.value)} />
+              <Button variant="destructive" size="icon" onClick={() => removeSkill(index)}><Trash2 className="h-4 w-4" /></Button>
+            </div>
+          ))}
+          <Button onClick={addSkill}>Add Skill</Button>
+
+          <Separator/>
+
+          <h3 className="font-semibold text-lg flex items-center">Certificates</h3>
+          {resumeData.certificates.map((cert, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <Input placeholder="Certificate" value={cert} onChange={e => handleCertificateChange(index, e.target.value)} />
+              <Button variant="destructive" size="icon" onClick={() => removeCertificate(index)}><Trash2 className="h-4 w-4" /></Button>
+            </div>
+          ))}
+          <Button onClick={addCertificate}>Add Certificate</Button>
           
           <Separator />
 
@@ -311,10 +450,92 @@ function ResumeBuilder() {
 
         </CardContent>
       </Card>
-      <div className="lg:sticky top-24 h-auto lg:h-[calc(100vh-8rem)] overflow-y-auto">
+      <div className="lg:sticky top-24">
         <ResumePreview data={resumeData} />
       </div>
     </div>
+  );
+}
+
+
+import * as pdfjs from 'pdfjs-dist';
+
+function ResumeUpload() {
+  const [file, setFile] = useState<File | null>(null);
+  const [resumeText, setResumeText] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [analysis, setAnalysis] = useState<AnalyzeResumeOutput | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setLoading(true);
+      setError(null);
+      setAnalysis(null);
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
+          const doc = await pdfjs.getDocument(event.target.result as ArrayBuffer).promise;
+          let text = '';
+          for (let i = 1; i <= doc.numPages; i++) {
+            const page = await doc.getPage(i);
+            const content = await page.getTextContent();
+            text += content.items.map((item: any) => item.str).join(' ');
+          }
+          setResumeText(text);
+        } catch (error) {
+          console.error("Failed to parse PDF:", error);
+          setError(`Failed to parse PDF: ${error.message}`);
+        }
+        setLoading(false);
+      };
+      reader.readAsArrayBuffer(selectedFile);
+    }
+  };
+
+  const handleAnalyzeResume = async () => {
+    if (!resumeText) return;
+    setLoading(true);
+    setError(null);
+    setAnalysis(null);
+    try {
+      const result = await analyzeResume({ resumeText });
+      setAnalysis(result);
+    } catch (e) {
+      console.error(e);
+      setError("Failed to analyze resume. Please try again.");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <Card className="max-w-4xl mx-auto">
+      <CardHeader>
+        <CardTitle className="font-headline">Upload PDF CV</CardTitle>
+        <CardDescription>Upload your resume in PDF format to get an AI-powered analysis.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="resume-upload">Upload your CV (PDF only)</Label>
+          <Input id="resume-upload" type="file" accept=".pdf" onChange={handleFileChange} />
+        </div>
+        {resumeText && (
+          <div className="space-y-4">
+            <Textarea value={resumeText} readOnly className="min-h-[200px] bg-muted/50" />
+            <Button onClick={handleAnalyzeResume} disabled={loading}>
+              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+              Analyze Resume
+            </Button>
+          </div>
+        )}
+        {loading && <p className="text-sm text-muted-foreground animate-pulse">AI is thinking...</p>}
+        {error && <p className="text-sm text-destructive mt-2">{error}</p>}
+        <ResumeAnalysisDisplay analysis={analysis} />
+      </CardContent>
+    </Card>
   );
 }
 
@@ -669,8 +890,9 @@ export default function JobSeekerPage() {
   return (
     <div className="container mx-auto max-w-7xl py-8 px-4">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-6">
           <TabsTrigger value="builder">Resume Builder</TabsTrigger>
+          <TabsTrigger value="upload">Upload CV</TabsTrigger>
           <TabsTrigger value="insights">AI Resume Insights</TabsTrigger>
           <TabsTrigger value="suggestions">AI Job Suggestions</TabsTrigger>
           <TabsTrigger value="search">Job Search</TabsTrigger>
@@ -678,6 +900,9 @@ export default function JobSeekerPage() {
         </TabsList>
         <TabsContent value="builder" className="mt-4">
           <ResumeBuilder />
+        </TabsContent>
+        <TabsContent value="upload" className="mt-4">
+          <ResumeUpload />
         </TabsContent>
         <TabsContent value="insights" className="mt-4">
           <ResumeInsights />
